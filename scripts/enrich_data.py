@@ -1,7 +1,7 @@
 import json
 import os
 import time
-from typing import List
+from typing import List, Optional
 from google import genai
 from google.genai import types
 from pydantic import BaseModel, Field
@@ -23,12 +23,12 @@ client = genai.Client(
 
 class CarTechnicalDetails(BaseModel):
     id: str
-    transmission: str = Field(description="Manual or Automatic")
-    engine_type: str = Field(description="Electric, Hybrid, or Combustion")
-    is_turbo: bool = Field(description="True if engine is Turbo (TSI, T, Turbo, etc)")
-    fuel_type: str = Field(description="Gasoline, Diesel, or Electric")
-    segment: str = Field(description="SUV, Hatchback, Sedan, Pickup, etc.")
-    airbags: int = Field(description="Number of airbags (int).")
+    transmission: str = Field(default="Unknown", description="Manual or Automatic")
+    engine_type: str = Field(default="Unknown", description="Electric, Hybrid, or Combustion")
+    fuel_type: str = Field(default="Unknown", description="Gasoline, Diesel, or Electric")
+    segment: str = Field(default="Unknown", description="SUV, Hatchback, Sedan, Pickup, etc.")
+    is_turbo: bool = Field(default=False, description="True if engine is Turbo (TSI, T, etc)")
+    airbags: int = Field(default=0, description="Number of airbags.")
 
 def enrich_cars_batch(car_batch: List[dict]) -> List[dict]:
     prompt = """
@@ -76,6 +76,17 @@ def main():
                 if raw_car["id"] in enriched_map:
                     extra_info = enriched_map[raw_car["id"]].model_dump()
                     final_data.append({**raw_car, **extra_info})
+                else:
+                    print(f"Car omitted '{raw_car['id']}'. Using default values.")
+                    fallback_info = {
+                        "transmission": "Unknown",
+                        "engine_type": "Unknown",
+                        "is_turbo": False,
+                        "fuel_type": "Unknown",
+                        "segment": "Unknown",
+                        "airbags": 0
+                    }
+                    final_data.append({**raw_car, **fallback_info})
             
             with open(output_path, "w", encoding="utf-8") as f:
                 json.dump(final_data, f, ensure_ascii=False, indent=2)
