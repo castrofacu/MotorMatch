@@ -19,7 +19,6 @@ def create_table(cursor: sqlite3.Cursor):
             id TEXT PRIMARY KEY,
             brand TEXT NOT NULL,
             model TEXT NOT NULL,
-            version TEXT,
             price_usd INTEGER NOT NULL,
             segment TEXT,
             transmission TEXT,
@@ -53,7 +52,6 @@ def main():
             car.get("id"),
             car.get("brand", "Unknown"),
             car.get("model", "Unknown"),
-            car.get("version", ""),
             car.get("price_usd", 0),
             car.get("segment", "Unknown"),
             car.get("transmission", "Unknown"),
@@ -66,13 +64,12 @@ def main():
 
     query = """
         INSERT INTO cars (
-            id, brand, model, version, price_usd, segment, 
+            id, brand, model, price_usd, segment, 
             transmission, fuel_type, engine_type, is_turbo, airbags, queried_at
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ON CONFLICT(id) DO UPDATE SET
             brand=excluded.brand,
             model=excluded.model,
-            version=excluded.version,
             price_usd=excluded.price_usd,
             segment=excluded.segment,
             transmission=excluded.transmission,
