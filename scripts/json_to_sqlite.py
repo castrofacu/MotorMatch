@@ -89,7 +89,7 @@ def main():
         conn.commit()
         log.info(f"Success: {cursor.rowcount} records consolidated in {DB_PATH}.")
     except Exception as e:
-        log.error(f"Error in BD: {e}")
+        log.error(f"Database error while upserting cars into SQLite database at {DB_PATH}: {e}")
         conn.rollback()
     finally:
         conn.close()
