@@ -76,6 +76,17 @@ def main():
                 if raw_car["id"] in enriched_map:
                     extra_info = enriched_map[raw_car["id"]].model_dump()
                     final_data.append({**raw_car, **extra_info})
+                else:
+                    print(f"Car omitted '{raw_car['id']}'. Using default values.")
+                    fallback_info = {
+                        "transmission": "Unknown",
+                        "engine_type": "Unknown",
+                        "is_turbo": False,
+                        "fuel_type": "Unknown",
+                        "segment": "Unknown",
+                        "airbags": 0
+                    }
+                    final_data.append({**raw_car, **fallback_info})
             
             with open(output_path, "w", encoding="utf-8") as f:
                 json.dump(final_data, f, ensure_ascii=False, indent=2)
