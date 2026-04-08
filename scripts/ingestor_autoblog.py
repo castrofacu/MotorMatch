@@ -9,7 +9,6 @@ from typing import Optional
 import requests
 from bs4 import BeautifulSoup, Tag
 
-# --- Constants ---
 URL = "https://www.autoblog.com.uy/p/precios-0km.html"
 OUTPUT_DIR = "data"
 OUTPUT_FILE = os.path.join(OUTPUT_DIR, "autoblog_0km_prices.json")
@@ -24,7 +23,6 @@ HEADERS = {
 
 REQUEST_TIMEOUT = 30  # seconds
 
-# --- Logging Configuration ---
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(message)s",
@@ -32,7 +30,6 @@ logging.basicConfig(
 )
 log = logging.getLogger("motormatch")
 
-# --- Helper Functions ---
 
 def clean_price(text: str) -> Optional[int]:
     """Extracts integer value from price strings like 'USD 21.990'."""
@@ -44,7 +41,7 @@ def clean_price(text: str) -> Optional[int]:
         return None
     
     numeric_part = match.group(0)
-    # Remove dots (thousands separator in UY) or commas
+    # Remove dots or commas
     digits_only = re.sub(r"[^\d]", "", numeric_part)
     
     if not digits_only:
@@ -53,12 +50,10 @@ def clean_price(text: str) -> Optional[int]:
 
 
 def normalize_text(text: str) -> str:
-    """Standardizes text to Title Case and removes extra whitespace."""
     return " ".join(text.strip().split()).title()
 
 
 def slugify(text: str) -> str:
-    """Creates a URL-friendly identifier."""
     text = unicodedata.normalize("NFKD", text)
     text = text.encode("ascii", "ignore").decode("ascii")
     text = text.lower()
@@ -67,16 +62,6 @@ def slugify(text: str) -> str:
     text = re.sub(r"[^a-z0-9]+", "-", text)
     return text.strip("-")
 
-
-def infer_brand_model(version_name: str) -> tuple[str, str]:
-    """Splits full description into Model and Version."""
-    parts = version_name.strip().split(maxsplit=1)
-    model = normalize_text(parts[0]) if parts else "Unknown"
-    version = normalize_text(parts[1]) if len(parts) > 1 else ""
-    return model, version
-
-
-# --- Brand Mapping & Logic ---
 
 DOMAIN_BRAND_MAP: dict[str, str] = {
     "multimotors": "Ford",
@@ -104,7 +89,6 @@ def brand_from_url(url_text: str) -> Optional[str]:
     u = url_text.lower().replace("http://", "").replace("https://", "")
     domain = u.split("/")[0].replace("www.", "").split(".")[0]
     
-    # BLACKLIST: Internal links that are not car brands
     if "autoblog" in domain or domain == "p":
         return None
     
@@ -115,7 +99,6 @@ def brand_from_url(url_text: str) -> Optional[str]:
 
 
 def parse_price_item(li_tag: Tag) -> Optional[tuple[str, int]]:
-    """Parses a list item into (description, price)."""
     full_text = li_tag.get_text(separator=" ", strip=True)
     parts = full_text.rsplit(" - ", maxsplit=1)
     
@@ -130,8 +113,6 @@ def parse_price_item(li_tag: Tag) -> Optional[tuple[str, int]]:
 
     return description, price_val
 
-
-# --- Main Scraper Logic ---
 
 def scrape(url: str) -> list[dict]:
     log.info("Fetching %s...", url)
@@ -158,7 +139,6 @@ def scrape(url: str) -> list[dict]:
         log.warning("Main container not found. Falling back to body.")
         content = soup.body
 
-    # STATE MACHINE VARIABLES
     current_brand = "No Brand"
 
     RE_BRAND_URL = re.compile(
@@ -172,7 +152,6 @@ def scrape(url: str) -> list[dict]:
 
         tag_name = element.name.lower()
 
-        # 1. Update brand context ONLY if a valid brand URL is found
         if tag_name == "a":
             href = element.get("href", "")
             text = element.get_text(strip=True)
@@ -185,25 +164,26 @@ def scrape(url: str) -> list[dict]:
                     current_brand = detected_brand
                 continue
 
-        # 2. Process items using the current validated brand
         if tag_name == "li":
             result = parse_price_item(element)
             if result:
                 description, price_usd = result
-                model, version = infer_brand_model(description)
                 
-                slug = slugify(f"{current_brand} {description}")
+                full_model = normalize_text(description)
+                
+                if "Α" in full_model:
+                    full_model = full_model.replace("Α", "A")
+                
+                slug = slugify(f"{current_brand} {full_model}")
 
                 records.append({
                     "id": slug,
                     "brand": normalize_text(current_brand),
-                    "model": model,
-                    "version": version,
+                    "model": full_model,
                     "price_usd": price_usd,
                     "queried_at": query_date,
                 })
-
-    # Deduplicate results
+                
     seen = set()
     unique_records = []
     for r in records:

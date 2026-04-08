@@ -37,7 +37,7 @@ def enrich_cars_batch(car_batch: List[dict]) -> List[dict]:
     """
     
     input_text = json.dumps([
-        {"id": c["id"], "text": f"{c['brand']} {c['model']} {c['version']}"} 
+        {"id": c["id"], "text": f"{c['brand']} {c['model']}"} 
         for c in car_batch
     ])
 
