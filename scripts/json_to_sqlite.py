@@ -21,7 +21,6 @@ def create_table(cursor: sqlite3.Cursor):
             model TEXT NOT NULL,
             version TEXT,
             price_usd INTEGER NOT NULL,
-            category TEXT,
             segment TEXT,
             transmission TEXT,
             fuel_type TEXT,
@@ -69,7 +68,7 @@ def main():
         INSERT INTO cars (
             id, brand, model, version, price_usd, segment, 
             transmission, fuel_type, engine_type, is_turbo, airbags, queried_at
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ON CONFLICT(id) DO UPDATE SET
             brand=excluded.brand,
             model=excluded.model,
