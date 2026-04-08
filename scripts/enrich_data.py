@@ -23,12 +23,12 @@ client = genai.Client(
 
 class CarTechnicalDetails(BaseModel):
     id: str
-    transmission: str = Field(description="Manual or Automatic")
-    engine_type: str = Field(description="Electric, Hybrid, or Combustion")
-    is_turbo: bool = Field(description="True if engine is Turbo (TSI, T, Turbo, etc)")
-    fuel_type: str = Field(description="Gasoline, Diesel, or Electric")
-    segment: str = Field(description="SUV, Hatchback, Sedan, Pickup, etc.")
-    airbags: int = Field(description="Number of airbags (int).")
+    transmission: str = Field(default="Unknown", description="Manual or Automatic")
+    engine_type: str = Field(default="Unknown", description="Electric, Hybrid, or Combustion")
+    fuel_type: str = Field(default="Unknown", description="Gasoline, Diesel, or Electric")
+    segment: str = Field(default="Unknown", description="SUV, Hatchback, Sedan, Pickup, etc.")
+    is_turbo: bool = Field(default=False, description="True if engine is Turbo (TSI, T, etc)")
+    airbags: Optional[int] = Field(default=None, description="Number of airbags. Leave null if unsure.")
 
 def enrich_cars_batch(car_batch: List[dict]) -> List[dict]:
     prompt = """
