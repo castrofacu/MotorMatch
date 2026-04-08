@@ -1,7 +1,7 @@
 import json
 import os
 import time
-from typing import List
+from typing import List, Optional
 from google import genai
 from google.genai import types
 from pydantic import BaseModel, Field
@@ -28,7 +28,7 @@ class CarTechnicalDetails(BaseModel):
     fuel_type: str = Field(default="Unknown", description="Gasoline, Diesel, or Electric")
     segment: str = Field(default="Unknown", description="SUV, Hatchback, Sedan, Pickup, etc.")
     is_turbo: bool = Field(default=False, description="True if engine is Turbo (TSI, T, etc)")
-    airbags: Optional[int] = Field(default=None, description="Number of airbags. Leave null if unsure.")
+    airbags: int = Field(default=0, description="Number of airbags.")
 
 def enrich_cars_batch(car_batch: List[dict]) -> List[dict]:
     prompt = """
