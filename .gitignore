@@ -1,4 +1,3 @@
-# ── Python Environment ────────────────────────────────────────────────────────
 .venv/
 venv/
 env/
@@ -11,28 +10,19 @@ dist/
 build/
 *.egg-info/
 
-# ── Node / Frontend ───────────────────────────────────────────────────────────
 node_modules/
 .next/
 .nuxt/
 dist/
-
-# ── Project-specific ──────────────────────────────────────────────────────────
-# Keep the DB tracked if you want version control of the data,
-# otherwise uncomment the next line:
-# data/
 
 *.log
 *.json
 !package.json
 !package-lock.json
 
-# ── Environment Variables ─────────────────────────────────────────────────────
 .env
 .env.*
 !.env.example
-
-# ── Editor / OS ───────────────────────────────────────────────────────────────
 .DS_Store
 Thumbs.db
 *.swp
