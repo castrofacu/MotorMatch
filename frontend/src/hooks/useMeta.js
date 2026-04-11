@@ -6,8 +6,14 @@ export function useMeta() {
   const [segments, setSegments] = useState([])
 
   useEffect(() => {
-    fetchBrands().then(setBrands).catch(console.error)
-    fetchSegments().then(setSegments).catch(console.error)
+    let cancelled = false
+    fetchBrands()
+      .then((data) => { if (!cancelled) setBrands(data) })
+      .catch(console.error)
+    fetchSegments()
+      .then((data) => { if (!cancelled) setSegments(data) })
+      .catch(console.error)
+    return () => { cancelled = true }
   }, [])
 
   return { brands, segments }

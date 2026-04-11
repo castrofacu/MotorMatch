@@ -31,8 +31,9 @@ export function FilterSidebar({
 
         {/* Brand */}
         <div className="flex flex-col gap-1.5">
-          <label className="text-sm font-medium text-gray-700">Marca</label>
+          <label htmlFor="filter-brand" className="text-sm font-medium text-gray-700">Marca</label>
           <select
+            id="filter-brand"
             value={filters.brand}
             onChange={(e) => onChange('brand', e.target.value)}
             className="w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-indigo-400 transition"
@@ -46,8 +47,9 @@ export function FilterSidebar({
 
         {/* Segment */}
         <div className="flex flex-col gap-1.5">
-          <label className="text-sm font-medium text-gray-700">Segmento</label>
+          <label htmlFor="filter-segment" className="text-sm font-medium text-gray-700">Segmento</label>
           <select
+            id="filter-segment"
             value={filters.segment}
             onChange={(e) => onChange('segment', e.target.value)}
             className="w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-indigo-400 transition"
@@ -61,10 +63,11 @@ export function FilterSidebar({
 
         {/* Price range */}
         <div className="flex flex-col gap-1.5">
-          <label className="text-sm font-medium text-gray-700">Precio (USD)</label>
+          <span className="text-sm font-medium text-gray-700">Precio (USD)</span>
           <div className="flex gap-2">
             <input
               type="number"
+              aria-label="Precio mínimo en USD"
               placeholder="Mín"
               min={0}
               value={filters.minPrice}
@@ -73,6 +76,7 @@ export function FilterSidebar({
             />
             <input
               type="number"
+              aria-label="Precio máximo en USD"
               placeholder="Máx"
               min={0}
               value={filters.maxPrice}

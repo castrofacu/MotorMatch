@@ -1,4 +1,4 @@
-const API_BASE = 'http://localhost:8000/api'
+const API_BASE = import.meta.env.VITE_API_BASE ?? 'http://localhost:8000/api'
 
 async function apiFetch(path, params = {}) {
   const url = new URL(`${API_BASE}${path}`)
@@ -8,7 +8,16 @@ async function apiFetch(path, params = {}) {
     }
   })
   const res = await fetch(url.toString())
-  if (!res.ok) throw new Error(`API error ${res.status}: ${res.statusText}`)
+  if (!res.ok) {
+    let message = `${res.status}: ${res.statusText}`
+    try {
+      const body = await res.json()
+      message = body.detail ?? body.message ?? message
+    } catch {
+      try { message = (await res.text()) || message } catch { /* ignore */ }
+    }
+    throw new Error(message)
+  }
   return res.json()
 }
 

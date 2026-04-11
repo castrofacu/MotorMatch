@@ -1,7 +1,17 @@
 import { useEffect, useState } from 'react'
 import { fetchCars } from '../lib/api'
 
-export function useCars(filters) {
+export function useCars({
+  brand,
+  segment,
+  minPrice,
+  maxPrice,
+  isTurbo,
+  sortBy,
+  order,
+  page,
+  pageSize,
+}) {
   const [data, setData] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
@@ -10,7 +20,7 @@ export function useCars(filters) {
     let cancelled = false
     setLoading(true)
     setError(null)
-    fetchCars(filters)
+    fetchCars({ brand, segment, minPrice, maxPrice, isTurbo, sortBy, order, page, pageSize })
       .then((result) => {
         if (!cancelled) {
           setData(result)
@@ -26,18 +36,7 @@ export function useCars(filters) {
     return () => {
       cancelled = true
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    filters.brand,
-    filters.segment,
-    filters.minPrice,
-    filters.maxPrice,
-    filters.isTurbo,
-    filters.sortBy,
-    filters.order,
-    filters.page,
-    filters.pageSize,
-  ])
+  }, [brand, segment, minPrice, maxPrice, isTurbo, sortBy, order, page, pageSize])
 
   return { data, loading, error }
 }
