@@ -17,24 +17,25 @@ export function useCars({
   const [error, setError] = useState(null)
 
   useEffect(() => {
-    let cancelled = false
+    const controller = new AbortController()
     setLoading(true)
     setError(null)
-    fetchCars({ brand, segment, minPrice, maxPrice, isTurbo, sortBy, order, page, pageSize })
+    fetchCars(
+      { brand, segment, minPrice, maxPrice, isTurbo, sortBy, order, page, pageSize },
+      controller.signal,
+    )
       .then((result) => {
-        if (!cancelled) {
-          setData(result)
-          setLoading(false)
-        }
+        setData(result)
+        setLoading(false)
       })
       .catch((err) => {
-        if (!cancelled) {
+        if (err.name !== 'AbortError') {
           setError(err.message)
           setLoading(false)
         }
       })
     return () => {
-      cancelled = true
+      controller.abort()
     }
   }, [brand, segment, minPrice, maxPrice, isTurbo, sortBy, order, page, pageSize])
 
